@@ -12,6 +12,12 @@ from distutils.errors import (
 from .extension import RustExtension
 from .utils import Binding, Strip, cpython_feature, get_rust_version
 
+PYPY=False
+try:
+    import __pypy__
+    PYPY=True
+except:
+    pass
 
 class build_rust(Command):
     """ Command for building rust crates via cargo. """
@@ -79,6 +85,8 @@ class build_rust(Command):
 
         features = set(ext.features)
         features.update(cpython_feature(binding=ext.binding))
+        if PYPY:
+            features.add("pyo3/pypy")
 
         debug_build = ext.debug if ext.debug is not None else self.inplace
         debug_build = self.debug if self.debug is not None else debug_build
